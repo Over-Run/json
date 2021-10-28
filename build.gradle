@@ -1,0 +1,117 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'signing'
+    id 'maven-publish'
+}
+
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
+
+group 'io.github.over-run'
+archivesBaseName = 'json'
+version = '0.1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo1.maven.org/maven2' }
+    //maven { url 'https://maven.aliyun.com/repository/central' }
+    //maven { url 'https://jitpack.io' }
+    // temporary maven repositories
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/releases' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
+}
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:22.0.0'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    from 'LICENSE'
+    manifest {
+        attributes 'Specification-Title': 'json',
+                'Specification-Vendor': 'Overrun Organization',
+                'Specification-Version': '1',
+                'Implementation-Title': 'json',
+                'Implementation-Vendor': 'Overrun Organization',
+                'Implementation-Version': archiveVersion
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set 'sources'
+    from sourceSets.main.allSource, 'LICENSE', 'changelog.txt'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set 'javadoc'
+    from javadoc, 'LICENSE', 'changelog.txt'
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing.publications {
+    mavenJava(MavenPublication) {
+        groupId = 'io.github.over-run'
+        artifactId = 'json'
+        version = project.version
+        description = 'JSON for Java.'
+        from components.java
+        pom {
+            name = 'GLUtils'
+            description = 'JSON for Java.'
+            url = 'https://github.com/Over-Run/json'
+            licenses {
+                license {
+                    name = 'The MIT License'
+                    url = 'https://raw.githubusercontent.com/Over-Run/json/1.x/LICENSE'
+                }
+            }
+            developers {
+                developer {
+                    id = 'squid233'
+                    name = 'squid233'
+                    email = '513508220@qq.com'
+                }
+            }
+            scm {
+                connection = 'https://github.com/Over-Run/json.git'
+                developerConnection = 'https://github.com/Over-Run/json.git'
+                url = 'https://github.com/Over-Run/json'
+            }
+        }
+    }
+}
+// You should add 'OSSRH_USERNAME' and 'OSSRH_PASSWORD'
+// to environment path
+// You should add 'signing.keyId', 'signing.password'
+// and 'signing.secretKeyRingFile'
+// to GRADLE_USER_HOME/gradle.properties
+publishing.repositories {
+    maven {
+        name = "OSSRH"
+        credentials {
+            username System.getenv("OSSRH_USERNAME")
+            password System.getenv("OSSRH_PASSWORD")
+        }
+        url = version.endsWith('-SNAPSHOT')
+                ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+                : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+idea.module.inheritOutputDirs = true
