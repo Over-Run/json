@@ -1,6 +1,6 @@
 package org.overrun.json;
 
-import static org.overrun.json.ValueType.*;
+import static org.overrun.json.JsonElement.*;
 
 /**
  * @author squid233
@@ -8,96 +8,41 @@ import static org.overrun.json.ValueType.*;
 public class JsonTest {
     public static void main(String[] args) {
         var json = new JSON(true);
-        var je = new JsonElement(
-            OBJECT, null,
-            new JsonElement[]{
-                new JsonElement(
-                    STRING, "org_name", "Overrun Organization"
+        var je = ofObj(null,
+            ofStr("org_name", "Overrun Organization"),
+            ofArr("members",
+                ofObj(null,
+                    ofStr("name", "ARMrAmzing"),
+                    ofBool("isMember", true),
+                    ofBool("isOwner", false)
                 ),
-                new JsonElement(
-                    ARRAY, "members",
-                    new JsonElement[]{
-                        new JsonElement(OBJECT, null,
-                            new JsonElement[]{
-                                new JsonElement(
-                                    STRING, "name", "ARMrAmzing"
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isMember", true
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isOwner", false
-                                )
-                            }
-                        ),
-                        new JsonElement(OBJECT, null,
-                            new JsonElement[]{
-                                new JsonElement(
-                                    STRING, "name", "beanflame"
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isMember", true
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isOwner", false
-                                )
-                            }
-                        ),
-                        new JsonElement(OBJECT, null,
-                            new JsonElement[]{
-                                new JsonElement(
-                                    STRING, "name", "crazy_piggy"
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isMember", true
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isOwner", false
-                                )
-                            }
-                        ),
-                        new JsonElement(OBJECT, null,
-                            new JsonElement[]{
-                                new JsonElement(
-                                    STRING, "name", "squid233"
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isMember", true
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isOwner", true
-                                )
-                            }
-                        ),
-                        new JsonElement(OBJECT, null,
-                            new JsonElement[]{
-                                new JsonElement(
-                                    STRING, "name", "Teddy Li"
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isMember", true
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isOwner", false
-                                )
-                            }
-                        ),
-                        new JsonElement(OBJECT, null,
-                            new JsonElement[]{
-                                new JsonElement(
-                                    STRING, "name", "wkmyc"
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isMember", true
-                                ),
-                                new JsonElement(
-                                    BOOLEAN, "isOwner", false
-                                )
-                            }
-                        )
-                    }
+                ofObj(null,
+                    ofStr("name", "beanflame"),
+                    ofBool("isMember", true),
+                    ofBool("isOwner", false)
+                ),
+                ofObj(null,
+                    ofStr("name", "crazy_piggy"),
+                    ofBool("isMember", true),
+                    ofBool("isOwner", false)
+                ),
+                ofObj(null,
+                    ofStr("name", "squid233"),
+                    ofBool("isMember", true),
+                    ofBool("isOwner", true)
+                ),
+                ofObj(null,
+                    ofStr("name", "Teddy Li"),
+                    ofBool("isMember", true),
+                    ofBool("isOwner", false
+                    )
+                ),
+                ofObj(null,
+                    ofStr("name", "wkmyc"),
+                    ofBool("isMember", true),
+                    ofBool("isOwner", false)
                 )
-            }
+            )
         );
         System.out.println(json.toJson(je));
     }

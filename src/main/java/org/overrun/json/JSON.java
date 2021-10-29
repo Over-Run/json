@@ -1,6 +1,7 @@
 package org.overrun.json;
 
 import java.io.IOException;
+import java.io.Writer;
 
 /**
  * @author squid233
@@ -20,6 +21,12 @@ public class JSON {
                        Appendable writer)
             throws IOException {
         writer.append(json.toJson(prettyPrint));
+    }
+
+    public void toJson(JsonElement json,
+                       Writer writer)
+        throws IOException {
+        writer.write(json.toJson(prettyPrint));
     }
 
     public void toJson(JsonElement json,

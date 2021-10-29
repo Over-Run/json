@@ -1,5 +1,7 @@
 package org.overrun.json;
 
+import static org.overrun.json.ValueType.*;
+
 /**
  * @author squid233
  * @since 0.1.0
@@ -8,6 +10,71 @@ public class JsonElement {
     public final ValueType type;
     public final String name;
     public final Object value;
+
+    public static class Builder {
+        public ValueType type;
+        public String name;
+        public Object value;
+
+        public Builder type(ValueType type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder value(Object value) {
+            this.value = value;
+            return this;
+        }
+
+        public JsonElement build() {
+            return new JsonElement(type, name, value);
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static JsonElement ofNul(String name) {
+        return new JsonElement(NULL, name, null);
+    }
+
+    public static JsonElement ofObj(String name, JsonElement... value) {
+        return new JsonElement(OBJECT, name, value);
+    }
+
+    public static JsonElement ofArr(String name, JsonElement... value) {
+        return new JsonElement(ARRAY, name, value);
+    }
+
+    public static JsonElement ofStr(String name, String value) {
+        return new JsonElement(STRING, name, value);
+    }
+
+    public static JsonElement ofBool(String name, boolean value) {
+        return new JsonElement(BOOLEAN, name, value);
+    }
+
+    public static JsonElement ofInt(String name, int value) {
+        return new JsonElement(NUMBER_INTEGER, name, value);
+    }
+
+    public static JsonElement ofFlt(String name, double value) {
+        return new JsonElement(NUMBER_FLOAT, name, value);
+    }
+
+    public static JsonElement ofFlt(String name, float value) {
+        return new JsonElement(NUMBER_FLOAT, name, value);
+    }
+
+    public static JsonElement ofBin(String name, byte[] value) {
+        return new JsonElement(BINARY, name, value);
+    }
 
     public JsonElement(ValueType type,
                        String name,
@@ -18,31 +85,31 @@ public class JsonElement {
     }
 
     public boolean isNull() {
-        return type == ValueType.NULL;
+        return type == NULL;
     }
 
     public boolean isObject() {
-        return type == ValueType.OBJECT;
+        return type == OBJECT;
     }
 
     public boolean isArray() {
-        return type == ValueType.ARRAY;
+        return type == ARRAY;
     }
 
     public boolean isString() {
-        return type == ValueType.STRING;
+        return type == STRING;
     }
 
     public boolean isBoolean() {
-        return type == ValueType.BOOLEAN;
+        return type == BOOLEAN;
     }
 
     public boolean isInt() {
-        return type == ValueType.NUMBER_INTEGER;
+        return type == NUMBER_INTEGER;
     }
 
     public boolean isFloat() {
-        return type == ValueType.NUMBER_FLOAT;
+        return type == NUMBER_FLOAT;
     }
 
     public boolean isNumber() {
@@ -50,11 +117,11 @@ public class JsonElement {
     }
 
     public boolean isBinary() {
-        return type == ValueType.BINARY;
+        return type == BINARY;
     }
 
     public boolean isDiscarded() {
-        return type == ValueType.DISCARDED;
+        return type == DISCARDED;
     }
 
     private void appendName(StringBuilder sb,
