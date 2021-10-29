@@ -1,6 +1,4 @@
-package org.overrrun.json;
-
-import static org.overrrun.json.ValueType.*;
+package org.overrun.json;
 
 /**
  * @author squid233
@@ -20,31 +18,31 @@ public class JsonElement {
     }
 
     public boolean isNull() {
-        return type == NULL;
+        return type == ValueType.NULL;
     }
 
     public boolean isObject() {
-        return type == OBJECT;
+        return type == ValueType.OBJECT;
     }
 
     public boolean isArray() {
-        return type == ARRAY;
+        return type == ValueType.ARRAY;
     }
 
     public boolean isString() {
-        return type == STRING;
+        return type == ValueType.STRING;
     }
 
     public boolean isBoolean() {
-        return type == BOOLEAN;
+        return type == ValueType.BOOLEAN;
     }
 
     public boolean isInt() {
-        return type == NUMBER_INTEGER;
+        return type == ValueType.NUMBER_INTEGER;
     }
 
     public boolean isFloat() {
-        return type == NUMBER_FLOAT;
+        return type == ValueType.NUMBER_FLOAT;
     }
 
     public boolean isNumber() {
@@ -52,11 +50,11 @@ public class JsonElement {
     }
 
     public boolean isBinary() {
-        return type == BINARY;
+        return type == ValueType.BINARY;
     }
 
     public boolean isDiscarded() {
-        return type == DISCARDED;
+        return type == ValueType.DISCARDED;
     }
 
     private void appendName(StringBuilder sb,
@@ -72,7 +70,7 @@ public class JsonElement {
     }
 
     private String toJson(final boolean prettyPrint,
-                          int i) {
+                          int indent) {
         var sb = new StringBuilder();
         switch (type) {
             case NULL:
@@ -86,12 +84,17 @@ public class JsonElement {
                 for (var v : (JsonElement[]) value) {
                     if (arri > 0) {
                         sb.append(",");
-                        if (prettyPrint) {
-                            sb.append(" ");
-                        }
                     }
-                    sb.append(v.toJson(prettyPrint, i));
+                    if (prettyPrint) {
+                        sb.append("\n")
+                            .append(" ".repeat(indent + 2));
+                    }
+                    sb.append(v.toJson(prettyPrint, indent + 2));
                     ++arri;
+                }
+                if (prettyPrint) {
+                    sb.append("\n")
+                        .append(" ".repeat(indent));
                 }
                 sb.append("}");
                 break;
@@ -102,12 +105,17 @@ public class JsonElement {
                 for (var v : (JsonElement[]) value) {
                     if (arri > 0) {
                         sb.append(",");
-                        if (prettyPrint) {
-                            sb.append(" ");
-                        }
                     }
-                    sb.append(v.toJson(prettyPrint, i));
+                    if (prettyPrint) {
+                        sb.append("\n")
+                            .append(" ".repeat(indent + 2));
+                    }
+                    sb.append(v.toJson(prettyPrint, indent + 2));
                     ++arri;
+                }
+                if (prettyPrint) {
+                    sb.append("\n")
+                        .append(" ".repeat(indent));
                 }
                 sb.append("]");
                 break;
@@ -117,11 +125,15 @@ public class JsonElement {
                     .append(value)
                     .append("\"");
                 break;
+            case BOOLEAN:
+                appendName(sb, prettyPrint);
+                sb.append(value);
+                break;
         }
         return sb.toString();
     }
 
-    public String toJson(boolean prettyPrint) {
+    protected String toJson(boolean prettyPrint) {
         return toJson(prettyPrint, 0);
     }
 

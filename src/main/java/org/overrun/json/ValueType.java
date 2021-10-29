@@ -1,4 +1,4 @@
-package org.overrrun.json;
+package org.overrun.json;
 
 /**
  * the JSON type enumeration
