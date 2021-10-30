@@ -10,35 +10,28 @@ public class JsonTest {
         var json = new JSON(true);
         var je = ofObj(null,
             ofStr("org_name", "Overrun Organization"),
-            ofArr("members",
-                ofObj(null,
-                    ofStr("name", "ARMrAmzing"),
+            ofObj("members",
+                ofObj("ARMrAmzing",
                     ofBool("isMember", true),
                     ofBool("isOwner", false)
                 ),
-                ofObj(null,
-                    ofStr("name", "beanflame"),
+                ofObj("beanflame",
                     ofBool("isMember", true),
                     ofBool("isOwner", false)
                 ),
-                ofObj(null,
-                    ofStr("name", "crazy_piggy"),
+                ofObj("crazy_piggy",
                     ofBool("isMember", true),
                     ofBool("isOwner", false)
                 ),
-                ofObj(null,
-                    ofStr("name", "squid233"),
+                ofObj("squid233",
                     ofBool("isMember", true),
                     ofBool("isOwner", true)
                 ),
-                ofObj(null,
-                    ofStr("name", "Teddy Li"),
+                ofObj("Teddy Li",
                     ofBool("isMember", true),
-                    ofBool("isOwner", false
-                    )
+                    ofBool("isOwner", false)
                 ),
-                ofObj(null,
-                    ofStr("name", "wkmyc"),
+                ofObj("wkmyc",
                     ofBool("isMember", true),
                     ofBool("isOwner", false)
                 )
