@@ -32,15 +32,20 @@ public class Json {
         var ln = str.toCharArray();
         var cpy = new int[ln.length];
         int l = 0;
+        // copy array
         for (int i = 0; i < ln.length; i++) {
             cpy[i] = ln[i];
         }
+        // iterate chars
         for (int i = 0; i < cpy.length; i++) {
+            // check if whitespace
             if (isWhitespace(cpy[i])) {
                 cpy[i] = -1;
                 continue;
             }
+            // check if string begin
             if (cpy[i] == '\"') {
+                // check if string end
                 while (cpy[++i] != '\"') {
                     ++l;
                 }
@@ -122,11 +127,13 @@ public class Json {
         var sb = new StringBuilder();
         if (reader instanceof BufferedReader) {
             String ln;
+            // append all lines
             while ((ln = ((BufferedReader) reader).readLine()) != null) {
                 sb.append(ln);
             }
         } else {
             int read;
+            // append all chars
             while ((read = reader.read()) != -1) {
                 sb.append((char) read);
             }

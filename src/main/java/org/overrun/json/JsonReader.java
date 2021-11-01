@@ -85,12 +85,15 @@ public final class JsonReader {
     public String nextName()
         throws IOException {
         var c = src.charAt(pos - 1);
+        // check if string begin
         if (c == '"') {
             var sb = new StringBuilder();
+            // check if string end
             while (src.charAt(++pos - 1) != '"') {
                 sb.append(src.charAt(pos - 1));
             }
             ++pos;
+            // check if separating name and value
             if (src.charAt(++pos - 2) != NAME_SEPARATOR) {
                 throw new IOException(ioe(NAME_SEPARATOR, c));
             }
@@ -102,12 +105,15 @@ public final class JsonReader {
     public String nextString()
         throws IOException {
         var c = src.charAt(pos - 1);
+        // check if string begin
         if (c == '"') {
             var sb = new StringBuilder();
+            // check if string end
             while (src.charAt(++pos - 1) != '"') {
                 sb.append(src.charAt(pos - 1));
             }
             ++pos;
+            // check if separating values
             if (src.charAt(pos - 1) == VALUE_SEPARATOR) {
                 ++pos;
             }
