@@ -1,5 +1,7 @@
 package org.overrun.json;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * the JSON type enumeration
  * <p>
@@ -13,45 +15,51 @@ public enum ValueType {
     /**
      * null value
      */
-    NULL,
+    NULL(null),
     /**
      * object (unordered set of name/value pairs)
      */
-    OBJECT,
+    OBJECT(JsonElement[].class),
     /**
      * array (ordered collection of values)
      */
-    ARRAY,
+    ARRAY(JsonElement[].class),
     /**
      * string value
      */
-    STRING,
+    STRING(String.class),
     /**
      * boolean value
      */
-    BOOLEAN,
+    BOOLEAN(boolean.class),
     /**
      * number value (signed integer)
      */
-    NUMBER_INTEGER,
+    NUMBER_INTEGER(int.class),
     /**
      * number value (floating-point)
      */
-    NUMBER_FLOAT,
+    NUMBER_FLOAT(double.class),
     /**
      * binary array (ordered collection of bytes)
      */
-    BINARY,
+    BINARY(byte[].class),
     /**
      * discarded by the parser callback function
      */
-    DISCARDED;
+    DISCARDED(null);
 
     private static final int[] ORDER = {
         0 /* null */, 3 /* object */, 4 /* array */, 5 /* string */,
         1 /* boolean */, 2 /* integer */, 2 /* float */,
         6 /* binary */
     };
+    @Nullable
+    public final Class<?> type;
+
+    ValueType(@Nullable Class<?> type) {
+        this.type = type;
+    }
 
     /**
      * comparison operator for JSON types

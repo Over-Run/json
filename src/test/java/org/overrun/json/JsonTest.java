@@ -7,7 +7,7 @@ import static org.overrun.json.JsonElement.*;
  */
 public class JsonTest {
     public static void main(String[] args) {
-        var json = new JSON(true);
+        var json = new Json(true);
         var je = ofObj(null,
             ofStr("org_name", "Overrun Organization"),
             ofObj("members",
@@ -37,6 +37,31 @@ public class JsonTest {
                 )
             )
         );
-        System.out.println(json.toJson(je));
+        var s = json.toJson(je);
+        System.out.println(je);
+        System.out.println(s);
+        System.out.println(Json.compress(s));
+        System.out.println("///////////////////////////////////////////////////////////////////////////");
+        try {
+            json.fromJson(new JsonType() {
+                @Override
+                public JsonElement write() {
+                    return null;
+                }
+
+                @Override
+                public void read(JsonReader in) throws Exception {
+                    in.beginObject();
+                    while (in.hasNext()) {
+                        System.out.print(in.nextName());
+                        System.out.print(":");
+                        System.out.println(in.nextString());
+                    }
+                    in.endObject();
+                }
+            }, "{\"name\":\"value\",\"name2\":\"value2\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

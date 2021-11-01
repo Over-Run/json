@@ -1,18 +1,26 @@
 package org.overrun.json;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+
+import static org.overrun.json.JsonReader.*;
 import static org.overrun.json.ValueType.*;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
-public class JsonElement {
+public final class JsonElement {
     public final ValueType type;
+    @Nullable
     public final String name;
     public final Object value;
+    public JsonElement base;
 
     public static class Builder {
         public ValueType type;
+        @Nullable
         public String name;
         public Object value;
 
@@ -69,7 +77,7 @@ public class JsonElement {
     }
 
     public static JsonElement ofFlt(String name, float value) {
-        return new JsonElement(NUMBER_FLOAT, name, value);
+        return ofFlt(name, (double) value);
     }
 
     public static JsonElement ofBin(String name, byte[] value) {
@@ -77,11 +85,16 @@ public class JsonElement {
     }
 
     public JsonElement(ValueType type,
-                       String name,
+                       @Nullable String name,
                        Object value) {
         this.type = type;
         this.name = name;
         this.value = value;
+        if (value.getClass() == JsonElement[].class) {
+            for (var e : (JsonElement[]) value) {
+                e.base = this;
+            }
+        }
     }
 
     public boolean isNull() {
@@ -128,8 +141,9 @@ public class JsonElement {
                             boolean prettyPrint) {
         if (name != null) {
             sb.append("\"")
-                .append(name)
-                .append("\":");
+                    .append(name)
+                    .append("\"")
+                    .append(NAME_SEPARATOR);
             if (prettyPrint) {
                 sb.append(" ");
             }
@@ -146,51 +160,51 @@ public class JsonElement {
                 break;
             case OBJECT:
                 appendName(sb, prettyPrint);
-                sb.append("{");
+                sb.append(BEGIN_OBJECT);
                 int arri = 0;
                 for (var v : (JsonElement[]) value) {
                     if (arri > 0) {
-                        sb.append(",");
+                        sb.append(VALUE_SEPARATOR);
                     }
                     if (prettyPrint) {
                         sb.append("\n")
-                            .append(" ".repeat(indent + 2));
+                                .append(" ".repeat(indent + 2));
                     }
                     sb.append(v.toJson(prettyPrint, indent + 2));
                     ++arri;
                 }
                 if (prettyPrint) {
                     sb.append("\n")
-                        .append(" ".repeat(indent));
+                            .append(" ".repeat(indent));
                 }
-                sb.append("}");
+                sb.append(END_OBJECT);
                 break;
             case ARRAY:
                 appendName(sb, prettyPrint);
-                sb.append("[");
+                sb.append(BEGIN_ARRAY);
                 arri = 0;
                 for (var v : (JsonElement[]) value) {
                     if (arri > 0) {
-                        sb.append(",");
+                        sb.append(VALUE_SEPARATOR);
                     }
                     if (prettyPrint) {
                         sb.append("\n")
-                            .append(" ".repeat(indent + 2));
+                                .append(" ".repeat(indent + 2));
                     }
                     sb.append(v.toJson(prettyPrint, indent + 2));
                     ++arri;
                 }
                 if (prettyPrint) {
                     sb.append("\n")
-                        .append(" ".repeat(indent));
+                            .append(" ".repeat(indent));
                 }
-                sb.append("]");
+                sb.append(END_ARRAY);
                 break;
             case STRING:
                 appendName(sb, prettyPrint);
                 sb.append("\"")
-                    .append(value)
-                    .append("\"");
+                        .append(value)
+                        .append("\"");
                 break;
             case BOOLEAN:
                 appendName(sb, prettyPrint);
@@ -200,18 +214,20 @@ public class JsonElement {
         return sb.toString();
     }
 
-    protected String toJson(boolean prettyPrint) {
+    String toJson(boolean prettyPrint) {
         return toJson(prettyPrint, 0);
     }
 
     @Override
     public String toString() {
         return "{type=" +
-            type +
-            ", name=" +
-            name +
-            ", value={" +
-            value +
-            "}}";
+                type +
+                ", name=" +
+                name +
+                ", value={" +
+                (value instanceof JsonElement[]
+                        ? Arrays.toString((JsonElement[]) value)
+                        : value) +
+                "}}";
     }
 }
