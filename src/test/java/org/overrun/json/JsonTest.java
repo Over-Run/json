@@ -8,58 +8,69 @@ import static org.overrun.json.JsonElement.*;
 public class JsonTest {
     public static void main(String[] args) {
         var json = new Json(true);
-        var je = ofObj(null,
-            ofStr("org_name", "Overrun Organization"),
-            ofObj("members",
-                ofObj("ARMrAmzing",
-                    ofBool("isMember", true),
-                    ofBool("isOwner", false)
-                ),
-                ofObj("beanflame",
-                    ofBool("isMember", true),
-                    ofBool("isOwner", false)
-                ),
-                ofObj("crazy_piggy",
-                    ofBool("isMember", true),
-                    ofBool("isOwner", false)
-                ),
-                ofObj("squid233",
-                    ofBool("isMember", true),
-                    ofBool("isOwner", true)
-                ),
-                ofObj("Teddy Li",
-                    ofBool("isMember", true),
-                    ofBool("isOwner", false)
-                ),
-                ofObj("wkmyc",
-                    ofBool("isMember", true),
-                    ofBool("isOwner", false)
-                )
-            )
-        );
-        var s = json.toJson(je);
-        System.out.println(je);
-        System.out.println(s);
-        System.out.println(Json.compress(s));
-        System.out.println("///////////////////////////////////////////////////////////////////////////");
-        try {
-            json.fromJson(new JsonType() {
-                @Override
-                public JsonElement write() {
-                    return null;
-                }
+        class Organization implements JsonType {
+            @Override
+            public JsonElement write() {
+                return ofObj(null,
+                    ofStr("org_name", "Overrun Organization"),
+                    ofObj("members",
+                        ofObj("ARMrAmzing",
+                            ofBool("isMember", true),
+                            ofBool("isOwner", false)
+                        ),
+                        ofObj("beanflame",
+                            ofBool("isMember", true),
+                            ofBool("isOwner", false)
+                        ),
+                        ofObj("crazy_piggy",
+                            ofBool("isMember", true),
+                            ofBool("isOwner", false)
+                        ),
+                        ofObj("squid233",
+                            ofBool("isMember", true),
+                            ofBool("isOwner", true)
+                        ),
+                        ofObj("Teddy Li",
+                            ofBool("isMember", true),
+                            ofBool("isOwner", false)
+                        ),
+                        ofObj("wkmyc",
+                            ofBool("isMember", true),
+                            ofBool("isOwner", false)
+                        )
+                    )
+                );
+            }
 
-                @Override
-                public void read(JsonReader in) throws Exception {
-                    in.beginObject();
-                    while (in.hasNext()) {
-                        System.out.print(in.nextName());
-                        System.out.print(":");
-                        System.out.println(in.nextString());
-                    }
-                    in.endObject();
+            @Override
+            public void read(JsonReader in) throws Exception {
+                in.beginObject();
+                for (int i = 0; i < 2; i++) {
+                    System.out.print(in.nextName());
+                    System.out.print(":");
+                    System.out.println(in.nextString());
                 }
-            }, "{\"name\":\"value\",\"name2\":\"value2\"}");
+                in.nextName();
+                in.nextNull();
+                for (int i = 0; i < 2; i++) {
+                    System.out.print(in.nextName());
+                    System.out.print(":");
+                    System.out.println(in.nextBoolean());
+                }
+                in.endObject();
+            }
+        }
+        try {
+            json.fromJson(
+                new Organization(),
+                "{\n" +
+                    "  \"name\": \"value\",\n" +
+                    "  \"name2\": \"value2\",\n" +
+                    "  \"nullV\": null,\n" +
+                    "  \"bool1\": true,\n" +
+                    "  \"bool2\": false\n" +
+                    "}"
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }

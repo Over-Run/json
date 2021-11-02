@@ -13,9 +13,9 @@ import static java.lang.String.valueOf;
  * @since 0.1.0
  */
 public class Json {
-    public static final int OVERRUN_JSON_VERSION_MAJOR = 0;
-    public static final int OVERRUN_JSON_VERSION_MINOR = 1;
-    public static final int OVERRUN_JSON_VERSION_PATCH = 0;
+    public static final int VERSION_MAJOR = 0;
+    public static final int VERSION_MINOR = 1;
+    public static final int VERSION_PATCH = 0;
     private final boolean prettyPrint;
 
     public Json(boolean prettyPrint) {
@@ -88,25 +88,25 @@ public class Json {
         return json.toJson(prettyPrint);
     }
 
-    public void toJson(JsonType json,
+    public void toJson(JsonWritable json,
                        Appendable writer)
         throws Exception {
         toJson(json.write(), writer);
     }
 
-    public void toJson(JsonType json,
+    public void toJson(JsonWritable json,
                        Writer writer)
         throws Exception {
         toJson(json.write(), writer);
     }
 
-    public void toJson(JsonType json,
+    public void toJson(JsonWritable json,
                        StringBuilder writer)
         throws Exception {
         toJson(json.write(), writer);
     }
 
-    public String toJson(JsonType json)
+    public String toJson(JsonWritable json)
         throws Exception {
         return toJson(json.write());
     }
@@ -115,13 +115,13 @@ public class Json {
     // Reading JSON
     ///////////////////////////////////////////////////////////////////////////
 
-    public void fromJson(JsonType type,
+    public void fromJson(JsonReadable type,
                          String src)
         throws Exception {
         type.read(new JsonReader(compress(src)));
     }
 
-    public void fromJson(JsonType type,
+    public void fromJson(JsonReadable type,
                          Reader reader)
         throws Exception {
         var sb = new StringBuilder();

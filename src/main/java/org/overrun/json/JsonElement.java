@@ -207,6 +207,8 @@ public final class JsonElement {
                         .append("\"");
                 break;
             case BOOLEAN:
+            case NUMBER_INTEGER:
+            case NUMBER_FLOAT:
                 appendName(sb, prettyPrint);
                 sb.append(value);
                 break;
