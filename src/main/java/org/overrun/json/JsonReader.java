@@ -2,7 +2,10 @@ package org.overrun.json;
 
 import java.io.IOException;
 
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
 import static java.lang.String.valueOf;
+import static org.overrun.json.JsonStrings.escape;
 
 /**
  * @author squid233
@@ -47,7 +50,7 @@ public final class JsonReader {
 
     private String ioe(String tk,
                        String c) {
-        return ioe(tk, c, pos - 1);
+        return ioe(tk, c, pos);
     }
 
     private String ioe(String tk,
@@ -133,7 +136,7 @@ public final class JsonReader {
                     pos
                 ));
             }
-            return sb.toString();
+            return escape(sb.toString());
         }
         throw new IOException(ioe('"', c, posOrg + 1));
     }
@@ -154,7 +157,7 @@ public final class JsonReader {
             if (src.charAt(pos) == VALUE_SEPARATOR) {
                 ++pos;
             }
-            return sb.toString();
+            return escape(sb.toString());
         }
         throw new IOException(ioe('"', c));
     }
@@ -201,7 +204,6 @@ public final class JsonReader {
                 && c0 != END_ARRAY) {
                 sb.append(src.charAt(pos));
             }
-            ++pos;
             var s = sb.toString();
             if ("true".equals(s)) {
                 b = true;
@@ -217,5 +219,51 @@ public final class JsonReader {
             return b;
         }
         throw new IOException(ioe("t or f", c));
+    }
+
+    public int nextInt()
+        throws IOException {
+        var c = src.charAt(pos);
+        var sb = new StringBuilder();
+        // check if int begin
+        if (c >= '0' && c <= '9') {
+            sb.append(c);
+            char c0;
+            // check if int end
+            while ((c0 = src.charAt(++pos)) != VALUE_SEPARATOR
+                && c0 != END_OBJECT
+                && c0 != END_ARRAY) {
+                sb.append(src.charAt(pos));
+            }
+            // check if separating values
+            if (src.charAt(pos) == VALUE_SEPARATOR) {
+                ++pos;
+            }
+            return parseInt(sb.toString());
+        }
+        throw new IOException(ioe("0 to 9", c));
+    }
+
+    public double nextDouble()
+        throws IOException {
+        var c = src.charAt(pos);
+        var sb = new StringBuilder();
+        // check if double begin
+        if (c >= '0' && c <= '9') {
+            sb.append(c);
+            char c0;
+            // check if double end
+            while ((c0 = src.charAt(++pos)) != VALUE_SEPARATOR
+                && c0 != END_OBJECT
+                && c0 != END_ARRAY) {
+                sb.append(src.charAt(pos));
+            }
+            // check if separating values
+            if (src.charAt(pos) == VALUE_SEPARATOR) {
+                ++pos;
+            }
+            return parseDouble(sb.toString());
+        }
+        throw new IOException(ioe("0 to 9", c));
     }
 }
