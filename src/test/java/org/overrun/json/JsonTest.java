@@ -50,8 +50,10 @@ public class JsonTest {
                     System.out.print(":");
                     System.out.println(in.nextString());
                 }
-                in.nextName();
+                System.out.print(in.nextName());
                 in.nextNull();
+                System.out.print(":");
+                System.out.println((Object) null);
                 for (int i = 0; i < 2; i++) {
                     System.out.print(in.nextName());
                     System.out.print(":");
@@ -60,16 +62,18 @@ public class JsonTest {
                 in.endObject();
             }
         }
+        var src = "{\n" +
+            "  \"name\": \"value\",\n" +
+            "  \"name2\": \"\\\"value2\",\n" +
+            "  \"nullV\": null,\n" +
+            "  \"bool1\": true,\n" +
+            "  \"bool2\": false\n" +
+            "}";
+        System.out.println(Json.compress(src));
         try {
             json.fromJson(
                 new Organization(),
-                "{\n" +
-                    "  \"name\": \"value\",\n" +
-                    "  \"name2\": \"value2\",\n" +
-                    "  \"nullV\": null,\n" +
-                    "  \"bool1\": true,\n" +
-                    "  \"bool2\": false\n" +
-                    "}"
+                src
             );
         } catch (Exception e) {
             e.printStackTrace();

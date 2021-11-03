@@ -23,13 +23,36 @@ public final class JsonReader {
     }
 
     private String ioe(String tk,
-                       char c) {
+                       String c,
+                       int pos) {
         return "Expected '" +
             tk +
             "' but got '" +
             c +
             "' at pos " +
-            (pos + 1);
+            pos;
+    }
+
+    private String ioe(String tk,
+                       char c,
+                       int pos) {
+        return ioe(tk, valueOf(c), pos);
+    }
+
+    private String ioe(char tk,
+                       char c,
+                       int pos) {
+        return ioe(valueOf(tk), c, pos);
+    }
+
+    private String ioe(String tk,
+                       String c) {
+        return ioe(tk, c, pos - 1);
+    }
+
+    private String ioe(String tk,
+                       char c) {
+        return ioe(tk, valueOf(c));
     }
 
     private String ioe(char tk,
@@ -91,22 +114,28 @@ public final class JsonReader {
 
     public String nextName()
         throws IOException {
+        int posOrg = pos;
         var c = src.charAt(pos);
         // check if string begin
         if (c == '"') {
             var sb = new StringBuilder();
             // check if string end
-            while (src.charAt(++pos) != '"') {
+            while (src.charAt(++pos) != '"'
+                || src.charAt(pos - 1) == '\\') {
                 sb.append(src.charAt(pos));
             }
             ++pos;
             // check if separating name and value
             if (src.charAt(++pos - 1) != NAME_SEPARATOR) {
-                throw new IOException(ioe(NAME_SEPARATOR, c));
+                throw new IOException(ioe(
+                    NAME_SEPARATOR,
+                    src.charAt(pos - 1),
+                    pos
+                ));
             }
             return sb.toString();
         }
-        throw new IOException(ioe('"', c));
+        throw new IOException(ioe('"', c, posOrg + 1));
     }
 
     public String nextString()
@@ -116,7 +145,8 @@ public final class JsonReader {
         if (c == '"') {
             var sb = new StringBuilder();
             // check if string end
-            while (src.charAt(++pos) != '"') {
+            while (src.charAt(++pos) != '"'
+                || src.charAt(pos - 1) == '\\') {
                 sb.append(src.charAt(pos));
             }
             ++pos;
@@ -132,12 +162,20 @@ public final class JsonReader {
     public void nextNull()
         throws IOException {
         var c = src.charAt(pos);
+        var sb = new StringBuilder();
         // check if null begin
         if (c == 'n') {
-            if (src.startsWith("null", pos)) {
-                pos += 4;
-            } else {
-                throw new IOException(ioe("null", c));
+            sb.append(c);
+            char c0;
+            // check if null end
+            while ((c0 = src.charAt(++pos)) != VALUE_SEPARATOR
+                && c0 != END_OBJECT
+                && c0 != END_ARRAY) {
+                sb.append(src.charAt(pos));
+            }
+            ++pos;
+            if (!"null".equals(sb.toString())) {
+                throw new IOException(ioe("null", sb.toString()));
             }
             // check if separating values
             if (src.charAt(pos) == VALUE_SEPARATOR) {
@@ -151,17 +189,26 @@ public final class JsonReader {
     public boolean nextBoolean()
         throws IOException {
         var c = src.charAt(pos);
+        var sb = new StringBuilder();
         // check if bool begin
         if (c == 't' || c == 'f') {
+            sb.append(c);
             boolean b;
-            if (src.startsWith("true", pos)) {
-                pos += 4;
+            char c0;
+            // check if bool end
+            while ((c0 = src.charAt(++pos)) != VALUE_SEPARATOR
+                && c0 != END_OBJECT
+                && c0 != END_ARRAY) {
+                sb.append(src.charAt(pos));
+            }
+            ++pos;
+            var s = sb.toString();
+            if ("true".equals(s)) {
                 b = true;
-            } else if (src.startsWith("false", pos)) {
-                pos += 5;
+            } else if ("false".equals(s)) {
                 b = false;
             } else {
-                throw new IOException(ioe("true or false", c));
+                throw new IOException(ioe("true or false", s));
             }
             // check if separating values
             if (src.charAt(pos) == VALUE_SEPARATOR) {
@@ -169,6 +216,6 @@ public final class JsonReader {
             }
             return b;
         }
-        throw new IOException(ioe("true or false", c));
+        throw new IOException(ioe("t or f", c));
     }
 }

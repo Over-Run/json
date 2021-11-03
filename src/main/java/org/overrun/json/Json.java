@@ -44,9 +44,9 @@ public class Json {
                 continue;
             }
             // check if string begin
-            if (cpy[i] == '\"') {
+            if (cpy[i] == '"') {
                 // check if string end
-                while (cpy[++i] != '\"') {
+                while (cpy[++i] != '"' || cpy[i - 1] == '\\') {
                     ++l;
                 }
                 ++l;
