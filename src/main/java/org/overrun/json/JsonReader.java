@@ -71,52 +71,33 @@ public final class JsonReader {
     // Begin or end
     ///////////////////////////////////////////////////////////////////////////
 
-    public void beginObject()
-        throws IOException {
+    private void nextChar(char tk) throws IOException {
         var c = src.charAt(pos);
-        if (c == BEGIN_OBJECT) {
-            ++pos;
-            return;
-        }
-        throw new IOException(ioe(BEGIN_OBJECT, c));
+        if (c == tk) ++pos;
+        else throw new IOException(ioe(tk, c));
     }
 
-    public void beginArray()
-        throws IOException {
-        var c = src.charAt(pos);
-        if (c == BEGIN_ARRAY) {
-            ++pos;
-            return;
-        }
-        throw new IOException(ioe(BEGIN_ARRAY, c));
+    public void beginObject() throws IOException {
+        nextChar(BEGIN_OBJECT);
     }
 
-    public void endObject()
-        throws IOException {
-        var c = src.charAt(pos);
-        if (c == END_OBJECT) {
-            ++pos;
-            return;
-        }
-        throw new IOException(ioe(END_OBJECT, c));
+    public void beginArray() throws IOException {
+        nextChar(BEGIN_ARRAY);
     }
 
-    public void endArray()
-        throws IOException {
-        var c = src.charAt(pos);
-        if (c == END_ARRAY) {
-            ++pos;
-            return;
-        }
-        throw new IOException(ioe(END_ARRAY, c));
+    public void endObject() throws IOException {
+        nextChar(END_OBJECT);
+    }
+
+    public void endArray() throws IOException {
+        nextChar(END_ARRAY);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Next
     ///////////////////////////////////////////////////////////////////////////
 
-    public String nextName()
-        throws IOException {
+    public String nextName() throws IOException {
         int posOrg = pos;
         var c = src.charAt(pos);
         // check if string begin
@@ -124,146 +105,106 @@ public final class JsonReader {
             var sb = new StringBuilder();
             // check if string end
             while (src.charAt(++pos) != '"'
-                || src.charAt(pos - 1) == '\\') {
+                || src.charAt(pos - 1) == '\\')
                 sb.append(src.charAt(pos));
-            }
             ++pos;
             // check if separating name and value
-            if (src.charAt(++pos - 1) != NAME_SEPARATOR) {
+            if (src.charAt(++pos - 1) != NAME_SEPARATOR)
                 throw new IOException(ioe(
                     NAME_SEPARATOR,
                     src.charAt(pos - 1),
                     pos
                 ));
-            }
             return escape(sb.toString());
         }
         throw new IOException(ioe('"', c, posOrg + 1));
     }
 
-    public String nextString()
-        throws IOException {
+    private void separateValue() {
+        // check if separating values
+        if (src.charAt(pos) == VALUE_SEPARATOR)
+            ++pos;
+    }
+
+    public String nextString() throws IOException {
         var c = src.charAt(pos);
         // check if string begin
         if (c == '"') {
             var sb = new StringBuilder();
             // check if string end
             while (src.charAt(++pos) != '"'
-                || src.charAt(pos - 1) == '\\') {
+                || src.charAt(pos - 1) == '\\')
                 sb.append(src.charAt(pos));
-            }
             ++pos;
-            // check if separating values
-            if (src.charAt(pos) == VALUE_SEPARATOR) {
-                ++pos;
-            }
+            separateValue();
             return escape(sb.toString());
         }
         throw new IOException(ioe('"', c));
     }
 
-    public void nextNull()
-        throws IOException {
+    private void nextValue(StringBuilder sb) {
+        char c0;
+        while ((c0 = src.charAt(++pos)) != VALUE_SEPARATOR
+            && c0 != END_OBJECT
+            && c0 != END_ARRAY)
+            sb.append(src.charAt(pos));
+    }
+
+    public void nextNull() throws IOException {
         var c = src.charAt(pos);
         var sb = new StringBuilder();
         // check if null begin
         if (c == 'n') {
             sb.append(c);
-            char c0;
             // check if null end
-            while ((c0 = src.charAt(++pos)) != VALUE_SEPARATOR
-                && c0 != END_OBJECT
-                && c0 != END_ARRAY) {
-                sb.append(src.charAt(pos));
-            }
+            nextValue(sb);
             ++pos;
-            if (!"null".equals(sb.toString())) {
+            if (!"null".equals(sb.toString()))
                 throw new IOException(ioe("null", sb.toString()));
-            }
-            // check if separating values
-            if (src.charAt(pos) == VALUE_SEPARATOR) {
-                ++pos;
-            }
+            separateValue();
             return;
         }
         throw new IOException(ioe('n', c));
     }
 
-    public boolean nextBoolean()
-        throws IOException {
+    public boolean nextBoolean() throws IOException {
         var c = src.charAt(pos);
         var sb = new StringBuilder();
         // check if bool begin
         if (c == 't' || c == 'f') {
             sb.append(c);
             boolean b;
-            char c0;
             // check if bool end
-            while ((c0 = src.charAt(++pos)) != VALUE_SEPARATOR
-                && c0 != END_OBJECT
-                && c0 != END_ARRAY) {
-                sb.append(src.charAt(pos));
-            }
+            nextValue(sb);
             var s = sb.toString();
-            if ("true".equals(s)) {
-                b = true;
-            } else if ("false".equals(s)) {
-                b = false;
-            } else {
-                throw new IOException(ioe("true or false", s));
-            }
-            // check if separating values
-            if (src.charAt(pos) == VALUE_SEPARATOR) {
-                ++pos;
-            }
+            if ("true".equals(s)) b = true;
+            else if ("false".equals(s)) b = false;
+            else throw new IOException(ioe("true or false", s));
+            separateValue();
             return b;
         }
         throw new IOException(ioe("t or f", c));
     }
 
-    public int nextInt()
-        throws IOException {
+    private String nextNumber() throws IOException {
         var c = src.charAt(pos);
         var sb = new StringBuilder();
-        // check if int begin
+        // check if number begin
         if (c >= '0' && c <= '9') {
             sb.append(c);
-            char c0;
-            // check if int end
-            while ((c0 = src.charAt(++pos)) != VALUE_SEPARATOR
-                && c0 != END_OBJECT
-                && c0 != END_ARRAY) {
-                sb.append(src.charAt(pos));
-            }
-            // check if separating values
-            if (src.charAt(pos) == VALUE_SEPARATOR) {
-                ++pos;
-            }
-            return parseInt(sb.toString());
+            // check if number end
+            nextValue(sb);
+            separateValue();
+            return sb.toString();
         }
         throw new IOException(ioe("0 to 9", c));
     }
 
-    public double nextDouble()
-        throws IOException {
-        var c = src.charAt(pos);
-        var sb = new StringBuilder();
-        // check if double begin
-        if (c >= '0' && c <= '9') {
-            sb.append(c);
-            char c0;
-            // check if double end
-            while ((c0 = src.charAt(++pos)) != VALUE_SEPARATOR
-                && c0 != END_OBJECT
-                && c0 != END_ARRAY) {
-                sb.append(src.charAt(pos));
-            }
-            // check if separating values
-            if (src.charAt(pos) == VALUE_SEPARATOR) {
-                ++pos;
-            }
-            return parseDouble(sb.toString());
-        }
-        throw new IOException(ioe("0 to 9", c));
+    public int nextInt() throws IOException {
+        return parseInt(nextNumber());
+    }
+
+    public double nextDouble() throws IOException {
+        return parseDouble(nextNumber());
     }
 }
