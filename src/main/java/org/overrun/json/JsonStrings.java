@@ -1,5 +1,7 @@
 package org.overrun.json;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
@@ -13,9 +15,18 @@ import static java.util.regex.Pattern.compile;
  * @since 0.1.0
  */
 public class JsonStrings {
-    private static final Pattern ESCAPE = compile("\\\\([\\\\\"bftnr]|(u)([0-9a-fA-F]{4}))");
+    private static final Pattern ESCAPE =
+        compile("\\\\([\\\\\"bftnr]|(u)([0-9a-fA-F]{4}))");
+    private static final Map<String, String> CACHE =
+        new HashMap<>();
 
     public static String escape(String s) {
+        if (!s.contains("\\")) {
+            return s;
+        }
+        if (CACHE.containsKey(s)) {
+            return CACHE.get(s);
+        }
         try (var sc = new Scanner(s)) {
             String s1 = s;
             var st = sc.findAll(ESCAPE).toArray(MatchResult[]::new);
@@ -54,6 +65,7 @@ public class JsonStrings {
                     );
                 }
             }
+            CACHE.put(s, s1);
             return s1;
         }
     }
