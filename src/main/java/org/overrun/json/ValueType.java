@@ -66,7 +66,7 @@ public enum ValueType {
      *
      * @param r right
      * @return an ordering that is similar to Python:<br>
-     * - order: null < boolean < number < object < array < string < binary<br>
+     * - order: null &lt; boolean &lt; number &lt; object &lt; array &lt; string &lt; binary<br>
      * - furthermore, each type is not smaller than itself<br>
      * - discarded values are not comparable<br>
      * - binary is represented as a b"" string in python and directly comparable to a
