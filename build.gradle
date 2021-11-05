@@ -9,7 +9,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
 
 group 'io.github.over-run'
 archivesBaseName = 'json'
-version = '0.1.0-SNAPSHOT'
+version = '0.1.0'
 
 repositories {
     mavenCentral()
