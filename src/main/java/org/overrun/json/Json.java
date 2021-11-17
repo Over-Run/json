@@ -1,9 +1,6 @@
 package org.overrun.json;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 
 import static java.lang.Character.isWhitespace;
 import static java.lang.String.valueOf;
@@ -14,7 +11,7 @@ import static java.lang.String.valueOf;
  */
 public class Json {
     public static final int VERSION_MAJOR = 0;
-    public static final int VERSION_MINOR = 1;
+    public static final int VERSION_MINOR = 2;
     public static final int VERSION_PATCH = 0;
     private final boolean prettyPrint;
 
@@ -91,38 +88,63 @@ public class Json {
     public void toJson(JsonWritable json,
                        Appendable writer)
         throws Exception {
-        toJson(json.write(), writer);
+        var w = json.write();
+        if (w != null) {
+            toJson(w, writer);
+        } else {
+            json.write(new JsonWriter(writer));
+        }
     }
 
     public void toJson(JsonWritable json,
                        Writer writer)
         throws Exception {
-        toJson(json.write(), writer);
+        var w = json.write();
+        if (w != null) {
+            toJson(w, writer);
+        } else {
+            json.write(new JsonWriter(writer));
+        }
     }
 
     public void toJson(JsonWritable json,
-                       StringBuilder writer)
-        throws Exception {
-        toJson(json.write(), writer);
+                       StringBuilder writer) {
+        try {
+            JsonElement w = json.write();
+            if (w != null) {
+                toJson(w, writer);
+            } else {
+                json.write(new JsonWriter(writer));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String toJson(JsonWritable json)
         throws Exception {
-        return toJson(json.write());
+        var w = json.write();
+        if (w != null) {
+            return toJson(w);
+        } else {
+            var writer = new JsonWriter(new StringBuilder());
+            json.write(writer);
+            return writer.toString();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Reading JSON
     ///////////////////////////////////////////////////////////////////////////
 
-    public void fromJson(JsonReadable type,
-                         String src)
+    public void load(JsonReadable type,
+                     String src)
         throws Exception {
         type.read(new JsonReader(compress(src)));
     }
 
-    public void fromJson(JsonReadable type,
-                         Reader reader)
+    public void load(JsonReadable type,
+                     Reader reader)
         throws Exception {
         var sb = new StringBuilder();
         if (reader instanceof BufferedReader) {
@@ -137,7 +159,8 @@ public class Json {
             while ((read = reader.read()) != -1) {
                 sb.append((char) read);
             }
+
         }
-        type.read(new JsonReader(compress(sb.toString())));
+        load(type, sb.toString());
     }
 }

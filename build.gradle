@@ -9,7 +9,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
 
 group 'io.github.over-run'
 archivesBaseName = 'json'
-version = '0.1.0'
+version = '0.2.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -23,6 +23,7 @@ repositories {
 
 dependencies {
     compileOnly 'org.jetbrains:annotations:22.0.0'
+    testCompileOnly 'org.jetbrains:annotations:22.0.0'
 }
 
 tasks.withType(JavaCompile) {
