@@ -6,18 +6,13 @@ import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.valueOf;
 import static org.overrun.json.Escape.unescape;
+import static org.overrun.json.Json.*;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
 public final class JsonReader {
-    public static final char BEGIN_ARRAY = '[';
-    public static final char BEGIN_OBJECT = '{';
-    public static final char END_ARRAY = ']';
-    public static final char END_OBJECT = '}';
-    public static final char NAME_SEPARATOR = ':';
-    public static final char VALUE_SEPARATOR = ',';
     private final String src;
     private int pos;
 

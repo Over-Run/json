@@ -1,6 +1,9 @@
 package org.overrun.json;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 
 import static java.lang.Character.isWhitespace;
 import static java.lang.String.valueOf;
@@ -10,6 +13,12 @@ import static java.lang.String.valueOf;
  * @since 0.1.0
  */
 public class Json {
+    public static final char BEGIN_ARRAY = '[';
+    public static final char BEGIN_OBJECT = '{';
+    public static final char END_ARRAY = ']';
+    public static final char END_OBJECT = '}';
+    public static final char NAME_SEPARATOR = ':';
+    public static final char VALUE_SEPARATOR = ',';
     public static final int VERSION_MAJOR = 0;
     public static final int VERSION_MINOR = 2;
     public static final int VERSION_PATCH = 0;
@@ -91,8 +100,6 @@ public class Json {
         var w = json.write();
         if (w != null) {
             toJson(w, writer);
-        } else {
-            json.write(new JsonWriter(writer));
         }
     }
 
@@ -102,22 +109,15 @@ public class Json {
         var w = json.write();
         if (w != null) {
             toJson(w, writer);
-        } else {
-            json.write(new JsonWriter(writer));
         }
     }
 
     public void toJson(JsonWritable json,
-                       StringBuilder writer) {
-        try {
-            JsonElement w = json.write();
-            if (w != null) {
-                toJson(w, writer);
-            } else {
-                json.write(new JsonWriter(writer));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+                       StringBuilder writer)
+        throws Exception {
+        var w = json.write();
+        if (w != null) {
+            toJson(w, writer);
         }
     }
 
@@ -126,11 +126,8 @@ public class Json {
         var w = json.write();
         if (w != null) {
             return toJson(w);
-        } else {
-            var writer = new JsonWriter(new StringBuilder());
-            json.write(writer);
-            return writer.toString();
         }
+        return "null";
     }
 
     ///////////////////////////////////////////////////////////////////////////

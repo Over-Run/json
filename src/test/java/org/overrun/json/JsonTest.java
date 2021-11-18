@@ -11,7 +11,7 @@ import static org.overrun.json.JsonElement.*;
  */
 public class JsonTest {
     private static void write(Json json) throws Exception {
-        System.out.println(json.toJson(JsonWritable.of(() ->
+        System.out.println(json.toJson(() ->
             ofObj(null,
                 ofStr("org_name", "Overrun Organization"),
                 ofObj("members",
@@ -46,7 +46,8 @@ public class JsonTest {
                         ofInt("permissions", 1)
                     )
                 )
-            ))));
+            )
+        ));
     }
 
     private static void compressRead(Json json) throws Exception {
