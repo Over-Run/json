@@ -6,3 +6,4 @@ Changed: Rename `fromJson` to `load`
 
 0.1.0
 Added: Json IO
+Added: Pretty print

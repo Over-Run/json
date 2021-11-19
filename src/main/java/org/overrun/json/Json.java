@@ -1,9 +1,6 @@
 package org.overrun.json;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 
 import static java.lang.Character.isWhitespace;
 import static java.lang.String.valueOf;
@@ -26,6 +23,23 @@ public class Json {
 
     public Json(boolean prettyPrint) {
         this.prettyPrint = prettyPrint;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private boolean prettyPrint;
+
+        public Builder prettyPrint() {
+            this.prettyPrint = true;
+            return this;
+        }
+
+        public Json build() {
+            return new Json(prettyPrint);
+        }
     }
 
     /**
@@ -76,18 +90,18 @@ public class Json {
     public void toJson(JsonElement json,
                        Appendable writer)
         throws IOException {
-        writer.append(json.toJson(prettyPrint));
+        writer.append(toJson(json));
     }
 
     public void toJson(JsonElement json,
                        Writer writer)
         throws IOException {
-        writer.write(json.toJson(prettyPrint));
+        writer.write(toJson(json));
     }
 
     public void toJson(JsonElement json,
                        StringBuilder writer) {
-        writer.append(json.toJson(prettyPrint));
+        writer.append(toJson(json));
     }
 
     public String toJson(JsonElement json) {

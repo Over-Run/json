@@ -106,7 +106,7 @@ public class JsonTest {
     }
 
     public static void main(String[] args) throws Exception {
-        var json = new Json(true);
+        var json = Json.builder().prettyPrint().build();
         write(json);
         compressRead(json);
     }
