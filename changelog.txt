@@ -2,8 +2,7 @@ Update Json.java on adding new versions
 
 0.2.0
 Changed: Restore current pos on failed
-Changed: Rename `fromJson` to
-Added: JsonWriter
+Changed: Rename `fromJson` to `load`
 
 0.1.0
 Added: Json IO

@@ -101,28 +101,6 @@ public class JsonTest {
                 }
                 System.out.println(o);
             }
-            /*for (int i = 0; i < 3; i++) {
-                System.out.print(in.nextName());
-                System.out.print(":");
-                System.out.println(in.nextString());
-            }
-            System.out.print(in.nextName());
-            System.out.print(":");
-            in.nextNull();
-            System.out.println((Object) null);
-            for (int i = 0; i < 2; i++) {
-                System.out.print(in.nextName());
-                System.out.print(":");
-                System.out.println(in.nextBoolean());
-            }
-            System.out.print(in.nextName());
-            System.out.print(":");
-            System.out.println(in.nextInt());
-            for (int i = 0; i < 3; i++) {
-                System.out.print(in.nextName());
-                System.out.print(":");
-                System.out.println(in.nextDouble());
-            }*/
             in.endObject();
         }, src);
     }
