@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-import static org.overrun.json.JsonReader.*;
+import static org.overrun.json.Json.*;
 import static org.overrun.json.ValueType.*;
 
 /**
