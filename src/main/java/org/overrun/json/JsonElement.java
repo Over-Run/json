@@ -216,7 +216,7 @@ public final class JsonElement {
         return sb.toString();
     }
 
-    String toJson(boolean prettyPrint) {
+    public String toJson(boolean prettyPrint) {
         return toJson(prettyPrint, 0);
     }
 

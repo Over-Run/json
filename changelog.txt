@@ -1,5 +1,7 @@
-Update JSON.java on adding new versions
+Update Json.java on adding new versions
+
+0.2.0
 
 0.1.0
-Added: Get JSON source from JsonElement
+Added: Json IO
 Added: Pretty print

@@ -7,7 +7,7 @@ import static org.overrun.json.JsonElement.*;
  */
 public class JsonTest {
     public static void main(String[] args) throws Exception {
-        var json = new Json(true);
+        var json = Json.builder().prettyPrint().build();
         class Organization implements JsonType {
             @Override
             public JsonElement write() {
