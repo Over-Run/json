@@ -5,19 +5,14 @@ import java.io.IOException;
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.valueOf;
-import static org.overrun.json.JsonStrings.escape;
+import static org.overrun.json.Escape.unescape;
+import static org.overrun.json.Json.*;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
 public final class JsonReader {
-    public static final char BEGIN_ARRAY = '[';
-    public static final char BEGIN_OBJECT = '{';
-    public static final char END_ARRAY = ']';
-    public static final char END_OBJECT = '}';
-    public static final char NAME_SEPARATOR = ':';
-    public static final char VALUE_SEPARATOR = ',';
     private final String src;
     private int pos;
 
@@ -109,13 +104,17 @@ public final class JsonReader {
                 sb.append(src.charAt(pos));
             ++pos;
             // check if separating name and value
-            if (src.charAt(++pos - 1) != NAME_SEPARATOR)
+            if (src.charAt(++pos - 1) != NAME_SEPARATOR) {
+                int np = pos;
+                // restore pos
+                pos = posOrg;
                 throw new IOException(ioe(
                     NAME_SEPARATOR,
-                    src.charAt(pos - 1),
-                    pos
+                    src.charAt(np - 1),
+                    np
                 ));
-            return escape(sb.toString());
+            }
+            return unescape(sb.toString());
         }
         throw new IOException(ioe('"', c, posOrg + 1));
     }
@@ -137,7 +136,7 @@ public final class JsonReader {
                 sb.append(src.charAt(pos));
             ++pos;
             separateValue();
-            return escape(sb.toString());
+            return unescape(sb.toString());
         }
         throw new IOException(ioe('"', c));
     }
@@ -151,6 +150,7 @@ public final class JsonReader {
     }
 
     public void nextNull() throws IOException {
+        int posOrg = pos;
         var c = src.charAt(pos);
         var sb = new StringBuilder();
         // check if null begin
@@ -159,8 +159,11 @@ public final class JsonReader {
             // check if null end
             nextValue(sb);
             ++pos;
-            if (!"null".equals(sb.toString()))
-                throw new IOException(ioe("null", sb.toString()));
+            if (!"null".equals(sb.toString())) {
+                int np = pos;
+                pos = posOrg;
+                throw new IOException(ioe("null", sb.toString(), np));
+            }
             separateValue();
             return;
         }
@@ -168,6 +171,7 @@ public final class JsonReader {
     }
 
     public boolean nextBoolean() throws IOException {
+        int posOrg = pos;
         var c = src.charAt(pos);
         var sb = new StringBuilder();
         // check if bool begin
@@ -179,7 +183,11 @@ public final class JsonReader {
             var s = sb.toString();
             if ("true".equals(s)) b = true;
             else if ("false".equals(s)) b = false;
-            else throw new IOException(ioe("true or false", s));
+            else {
+                int np = pos;
+                pos = posOrg;
+                throw new IOException(ioe("true or false", s, np));
+            }
             separateValue();
             return b;
         }

@@ -24,15 +24,29 @@ JSON for Java:coffee:.
 
 ```groovy
 dependencies {
-    implementation "io.github.over-run:json:0.1.0"
+    implementation "io.github.over-run:json:0.2.0"
 }
 ```
 
 ## Example
 
 ```java
+import org.overrun.json.*;
+
+import java.io.*;
+
 public class Example {
     public static void main(String[] args) {
+        var json = new Json(true);
+        try (var w = new FileWriter("ex.json");
+             var bw = new BufferedWriter(w)) {
+            json.toJson(
+                ofObj("name",
+                    ofStr("name", "value")
+                ),
+                bw
+            );
+        }
     }
 }
 ```

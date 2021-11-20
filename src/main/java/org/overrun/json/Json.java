@@ -1,9 +1,6 @@
 package org.overrun.json;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 
 import static java.lang.Character.isWhitespace;
 import static java.lang.String.valueOf;
@@ -13,13 +10,36 @@ import static java.lang.String.valueOf;
  * @since 0.1.0
  */
 public class Json {
+    public static final char BEGIN_ARRAY = '[';
+    public static final char BEGIN_OBJECT = '{';
+    public static final char END_ARRAY = ']';
+    public static final char END_OBJECT = '}';
+    public static final char NAME_SEPARATOR = ':';
+    public static final char VALUE_SEPARATOR = ',';
     public static final int VERSION_MAJOR = 0;
-    public static final int VERSION_MINOR = 1;
+    public static final int VERSION_MINOR = 2;
     public static final int VERSION_PATCH = 0;
     private final boolean prettyPrint;
 
     public Json(boolean prettyPrint) {
         this.prettyPrint = prettyPrint;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private boolean prettyPrint;
+
+        public Builder prettyPrint() {
+            this.prettyPrint = true;
+            return this;
+        }
+
+        public Json build() {
+            return new Json(prettyPrint);
+        }
     }
 
     /**
@@ -70,18 +90,18 @@ public class Json {
     public void toJson(JsonElement json,
                        Appendable writer)
         throws IOException {
-        writer.append(json.toJson(prettyPrint));
+        writer.append(toJson(json));
     }
 
     public void toJson(JsonElement json,
                        Writer writer)
         throws IOException {
-        writer.write(json.toJson(prettyPrint));
+        writer.write(toJson(json));
     }
 
     public void toJson(JsonElement json,
                        StringBuilder writer) {
-        writer.append(json.toJson(prettyPrint));
+        writer.append(toJson(json));
     }
 
     public String toJson(JsonElement json) {
@@ -91,38 +111,51 @@ public class Json {
     public void toJson(JsonWritable json,
                        Appendable writer)
         throws Exception {
-        toJson(json.write(), writer);
+        var w = json.write();
+        if (w != null) {
+            toJson(w, writer);
+        }
     }
 
     public void toJson(JsonWritable json,
                        Writer writer)
         throws Exception {
-        toJson(json.write(), writer);
+        var w = json.write();
+        if (w != null) {
+            toJson(w, writer);
+        }
     }
 
     public void toJson(JsonWritable json,
                        StringBuilder writer)
         throws Exception {
-        toJson(json.write(), writer);
+        var w = json.write();
+        if (w != null) {
+            toJson(w, writer);
+        }
     }
 
     public String toJson(JsonWritable json)
         throws Exception {
-        return toJson(json.write());
+        var w = json.write();
+        if (w != null) {
+            return toJson(w);
+        }
+        return "null";
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Reading JSON
     ///////////////////////////////////////////////////////////////////////////
 
-    public void fromJson(JsonReadable type,
-                         String src)
+    public void load(JsonReadable type,
+                     String src)
         throws Exception {
         type.read(new JsonReader(compress(src)));
     }
 
-    public void fromJson(JsonReadable type,
-                         Reader reader)
+    public void load(JsonReadable type,
+                     Reader reader)
         throws Exception {
         var sb = new StringBuilder();
         if (reader instanceof BufferedReader) {
@@ -137,7 +170,8 @@ public class Json {
             while ((read = reader.read()) != -1) {
                 sb.append((char) read);
             }
+
         }
-        type.read(new JsonReader(compress(sb.toString())));
+        load(type, sb.toString());
     }
 }

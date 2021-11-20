@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-import static org.overrun.json.JsonReader.*;
+import static org.overrun.json.Json.*;
 import static org.overrun.json.ValueType.*;
 
 /**
@@ -216,7 +216,7 @@ public final class JsonElement {
         return sb.toString();
     }
 
-    String toJson(boolean prettyPrint) {
+    public String toJson(boolean prettyPrint) {
         return toJson(prettyPrint, 0);
     }
 
